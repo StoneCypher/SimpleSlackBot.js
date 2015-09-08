@@ -1,0 +1,31 @@
+{
+  "name": "SimpleSlackBot.js",
+  "version": "0.0.1",
+  "description": "A better lightweight client for the Slack RTAPI",
+  "main": "dist/bot.es5.min.js",
+  "dependencies": {
+    "babel": "^5.8.23",
+    "gulp-babel": "^5.2.1",
+    "gulp": "^3.9.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StoneCypher/SimpleSlackBot.js.git"
+  },
+  "keywords": [
+    "slack",
+    "api",
+    "bot",
+    "chatbot"
+  ],
+  "author": "John Haugeland",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/StoneCypher/SimpleSlackBot.js/issues"
+  },
+  "homepage": "https://github.com/StoneCypher/SimpleSlackBot.js"
+}
