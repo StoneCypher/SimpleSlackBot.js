@@ -2,7 +2,7 @@
   "name": "SimpleSlackBot.js",
   "version": "0.0.1",
   "description": "A better lightweight client for the Slack RTAPI",
-  "main": "dist/bot.es5.min.js",
+  "main": "dist/Bot.js",
   "dependencies": {},
   "devDependencies": {
     "babel": "^5.8.23",
