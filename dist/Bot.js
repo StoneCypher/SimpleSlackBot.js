@@ -31,3 +31,12 @@ Object.defineProperty(exports, "DefaultHandler", {
     return _DefaultHandlerJs.DefaultHandler;
   }
 });
+
+var _MinimalHandlerJs = require("./MinimalHandler.js");
+
+Object.defineProperty(exports, "MinimalHandler", {
+  enumerable: true,
+  get: function get() {
+    return _MinimalHandlerJs.MinimalHandler;
+  }
+});

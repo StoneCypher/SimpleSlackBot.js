@@ -1,19 +1,23 @@
 
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var _DefaultHandlerJs = require("./DefaultHandler.js");
 
 var _DefaultHandlerJs2 = _interopRequireDefault(_DefaultHandlerJs);
+
+var _MinimalHandlerJs = require("./MinimalHandler.js");
+
+var _MinimalHandlerJs2 = _interopRequireDefault(_MinimalHandlerJs);
 
 var slack_lib = require('slack-client');
 
@@ -26,7 +30,7 @@ var Bridge = (function () {
     }
 
     this.key = options.key;
-    this.handlers = options.handlers || [new _DefaultHandlerJs2['default']()];
+    this.handlers = options.handlers || [new _DefaultHandlerJs2["default"](), new _MinimalHandlerJs2["default"]()];
     this.autoReconnect = options.autoReconnect || true;
     this.autoMark = options.autoMark || true;
 
@@ -38,7 +42,7 @@ var Bridge = (function () {
   }
 
   _createClass(Bridge, [{
-    key: 'channels',
+    key: "channels",
     value: function channels(uOptions) {
       var _this = this;
 
@@ -57,7 +61,7 @@ var Bridge = (function () {
       });
     }
   }, {
-    key: 'groups',
+    key: "groups",
     value: function groups(uOptions) {
       var _this2 = this;
 
@@ -79,7 +83,7 @@ var Bridge = (function () {
       });
     }
   }, {
-    key: 'makeMention',
+    key: "makeMention",
     value: function makeMention(userId, optionalName) {
       return '<@' + userId + (optionalName ? '|' + optionalName : '') + '>';
     }
@@ -88,7 +92,7 @@ var Bridge = (function () {
     // so get the host object and pass it in as self instead
 
   }, {
-    key: 'handleConnect',
+    key: "handleConnect",
     value: function handleConnect(self) {
 
       var lchannels = self.channels(),
@@ -101,7 +105,7 @@ var Bridge = (function () {
       });
     }
   }, {
-    key: 'channelUsers',
+    key: "channelUsers",
     value: function channelUsers(options) {
       var _this3 = this;
 
@@ -124,7 +128,7 @@ var Bridge = (function () {
     // so get the host object and pass it in as self instead
 
   }, {
-    key: 'handleMessage',
+    key: "handleMessage",
     value: function handleMessage(self, msg) {
 
       var channel = self.slack.getChannelGroupOrDMByID(msg.channel),
@@ -147,7 +151,7 @@ var Bridge = (function () {
       });
     }
   }, {
-    key: 'connect',
+    key: "connect",
     value: function connect() {
       var _this4 = this;
 

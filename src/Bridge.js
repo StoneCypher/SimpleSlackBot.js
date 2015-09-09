@@ -2,6 +2,7 @@
 'use strict';
 
 import DefaultHandler from "./DefaultHandler.js";
+import MinimalHandler from "./MinimalHandler.js";
 
 var slack_lib = require('slack-client');
 
@@ -18,7 +19,7 @@ export class Bridge {
     }
 
     this.key           = options.key;
-    this.handlers      = options.handlers      || [new DefaultHandler()];
+    this.handlers      = options.handlers      || [new DefaultHandler(), new MinimalHandler()];
     this.autoReconnect = options.autoReconnect || true;
     this.autoMark      = options.autoMark      || true;
 
