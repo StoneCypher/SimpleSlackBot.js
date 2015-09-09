@@ -42,6 +42,23 @@ export default class {
 
 
 
+  groups(options) {
+
+    var noOp              = (c => true),
+        maybeOpenOnly     = options.with_closed   ? noOp : (g =>  g.is_open),
+        maybeWithArchived = options.with_archived ? noOp : (g => !g.is_archived);
+
+    return Object
+      .keys(slack.groups)
+      .map(k => slack.groups[k])
+      .filter(maybeOpenOnly)
+      .filter(maybeWithArchived)
+      .map(g => name);
+
+  }
+
+
+
   handleConnect() {
 /*
     var channels = myChannels(),
