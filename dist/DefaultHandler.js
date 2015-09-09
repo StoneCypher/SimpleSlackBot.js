@@ -35,14 +35,35 @@ var DefaultHandler = (function (_Handler) {
     }
   }, {
     key: "on_connect",
-    value: function on_connect(C, G, N, T) {
-      console.log("Connected as " + N + " of " + T);
+    value: function on_connect(Channels, Groups, Name, Team) {
+      console.log("Connected to Slack as '" + Name + "' of team '" + Team + "'");
+      console.log("Member of " + Channels.length + " channels and " + Groups.length + " groups.");
     }
   }, {
     key: "on_message",
     value: function on_message(M) {
-      if (M.text.indexOf('SimpleSlackBot') === 0) {
+
+      var starts_with = function starts_with(X) {
+        return M.text.indexOf(X) === 0;
+      },
+          d6 = function d6() {
+        return (Math.floor(Math.random() * 6) + 1).toString();
+      };
+
+      if (starts_with('SimpleSlackBot')) {
         M.reply(":smile:");
+      }
+
+      // fallthrough is intentional
+      if (starts_with('SSB: Timestamp')) {
+        M.reply(" :clock3: " + new Date().getTime());
+      }
+      if (starts_with('SSB: Time')) {
+        M.reply(" :clock6: " + new Date().toLocaleString());
+      }
+
+      if (starts_with('SSB: Dice')) {
+        M.reply(" :game_die: " + d6() + " " + d6());
       }
     }
   }]);
