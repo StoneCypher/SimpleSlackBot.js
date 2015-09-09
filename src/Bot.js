@@ -8,7 +8,33 @@ var slack_lib = require('slack-client'),
 
 
 
-export default class Bot {
+export class Handler {
+
+  constructor()       {}
+
+  on_construct()      {}
+  on_connect(C,G,N,T) {}
+  on_message(M)       {}
+
+}
+
+
+
+
+
+export class DefaultHandler extends Handler {
+
+  on_construct()      { console.log("SimpleSlackBot default handler constructed."); }
+  on_connect(C,G,N,T) { console.log("Connected as " + N + " of " + T); }
+  on_message(M)       { if (M.text.indexOf('SimpleSlackBot') === 0) { M.reply(":smile:"); } }
+
+}
+
+
+
+
+
+export class Bridge {
 
   constructor(options) {
 
@@ -17,13 +43,13 @@ export default class Bot {
     }
 
     this.key           = options.key;
-    this.handlers      = options.handlers      || []; // whargarbl create default handler
+    this.handlers      = options.handlers      || [new DefaultHandler()];
     this.autoReconnect = options.autoReconnect || true;
     this.autoMark      = options.autoMark      || true;
 
     this.slack         = new slack_lib(this.key, this.autoReconnect, this.autoMark);
 
-    console.log('constructed!');
+    this.handlers.map(h => h.on_construct());
 
   }
 
@@ -65,24 +91,39 @@ export default class Bot {
 
 
 
+  makeMention(userId, optionalName) {
+    return '<@' + userId + (optionalName? ('|' + optionalName) : '') + '>';
+  }
+
+
+
   // because it's a slack bot callback, `this` will be slack
   // so get the host object and pass it in as self instead
 
   handleConnect(self) {
 
     var lchannels = self.channels(),
-        lgroups   = self.groups();
+        lgroups   = self.groups(),
+        lname     = self.slack.self.name,
+        lteam     = self.slack.team.name;
 
-    console.log('Welcome to Slack. You are ' + self.slack.self.name
-              + ' of '                       + self.slack.team.name);
+    return self.handlers.map(h => h.on_connect(lchannels, lgroups, lname, lteam));
 
-    console.log( (lchannels.length > 0)?
-      ('You are in channels #' + lchannels.join(', #')) :
-      ('You are not in any channels.'                ));
+  }
 
-    console.log( (lgroups.length > 0)?
-      ('You are in groups %' + lgroups.join(', %')) :
-      ('You are not in any groups.'              ));
+
+
+  channelUsers(options) {
+
+    if (!(options.channel)) { throw '`channel_users/1` requires a `slack channel` as `options.channel`'; }
+
+    var user_filter = options.include_bots?
+      (u => !!u && (u.presence === 'active'))
+    : (u => !!u && (u.presence === 'active') && !u.is_bot);
+
+    return (options.channel.members || [])
+      .map(id => this.slack.users[id])
+      .filter(user_filter);
 
   }
 
@@ -92,6 +133,22 @@ export default class Bot {
   // so get the host object and pass it in as self instead
 
   handleMessage(self, msg) {
+
+    var channel      = self.slack.getChannelGroupOrDMByID(msg.channel),
+        user         = self.slack.getUserByID(msg.user),
+
+        handler_data = {
+          "is_im"        : channel.is_im      === true,  // undef if false :|
+          "is_channel"   : channel.is_channel === true,  // undef if false :|
+          "message_type" : msg.type,                     // reserved word abuse :|
+          "username"     : user.name,
+          "channel"      : channel.is_channel? channel.name : false,
+          "mention"      : self.makeMention(channel.user, channel.name),
+          "text"         : msg.text,
+          "reply"        : function(Text) { channel.send(Text); }
+        };
+
+    self.handlers.map(h => h.on_message(handler_data));
 
   }
 
