@@ -29,6 +29,22 @@ var _default = (function () {
   }
 
   _createClass(_default, [{
+    key: 'channels',
+    value: function channels(options) {
+
+      var maybeMembersOnly = options.include_nonmember ? function (c) {
+        return true;
+      } : function (c) {
+        return c.is_member;
+      };
+
+      return Object.keys(slack.channels).map(function (k) {
+        return slack.channels[k];
+      }).filter(maybeMembersOnly).map(function (c) {
+        return c.name;
+      });
+    }
+  }, {
     key: 'handleConnect',
     value: function handleConnect() {
       /*

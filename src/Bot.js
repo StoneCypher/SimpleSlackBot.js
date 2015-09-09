@@ -27,6 +27,21 @@ export default class {
 
 
 
+  channels(options) {
+
+    var noOp             = (c => true),
+        maybeMembersOnly = options.with_nonmember? noOp : (c => c.is_member);
+
+    return Object
+      .keys(slack.channels)
+      .map(k => slack.channels[k])
+      .filter(maybeMembersOnly)
+      .map(c => c.name);
+
+  }
+
+
+
   handleConnect() {
 /*
     var channels = myChannels(),
