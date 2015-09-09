@@ -12,9 +12,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var slack_lib = require('slack-client'),
     util = require('util');
 
-var _default = (function () {
-  function _default(options) {
-    _classCallCheck(this, _default);
+var Bot = (function () {
+  function Bot(options) {
+    _classCallCheck(this, Bot);
 
     if (options.key.indexOf('xoxb') !== 0) {
       throw 'All valid Slack bot keys start \'xoxb\'.  Verify the `key` in your `options`.';
@@ -26,58 +26,93 @@ var _default = (function () {
     this.autoMark = options.autoMark || true;
 
     this.slack = new slack_lib(this.key, this.autoReconnect, this.autoMark);
+
+    console.log('constructed!');
   }
 
-  _createClass(_default, [{
+  _createClass(Bot, [{
     key: 'channels',
-    value: function channels(options) {
+    value: function channels(uOptions) {
+      var _this = this;
 
-      var maybeMembersOnly = options.include_nonmember ? function (c) {
+      var options = uOptions || {},
+          noOp = function noOp(c) {
         return true;
-      } : function (c) {
+      },
+          maybeMembersOnly = options.with_nonmember ? noOp : function (c) {
         return c.is_member;
       };
 
-      return Object.keys(slack.channels).map(function (k) {
-        return slack.channels[k];
+      return Object.keys(this.slack.channels).map(function (k) {
+        return _this.slack.channels[k];
       }).filter(maybeMembersOnly).map(function (c) {
         return c.name;
       });
     }
   }, {
-    key: 'handleConnect',
-    value: function handleConnect() {
-      /*
-          var channels = myChannels(),
-              groups   = myGroups();
-      */
-      console.log('Welcome to Slack. You are ' + this.slack.self.name + ' of ' + slack.team.name);
-      /*
-          console.log( (channels.length > 0)?
-            ('You are in channels #' + channels.join(', #')) :
-            ('You are not in any channels.'                ));
-      
-          console.log( (groups.length > 0)?
-            ('You are in groups %' + groups.join(', %')) :
-            ('You are not in any groups.'              ));
-      */
+    key: 'groups',
+    value: function groups(uOptions) {
+      var _this2 = this;
+
+      var options = uOptions || {},
+          noOp = function noOp(c) {
+        return true;
+      },
+          maybeOpenOnly = options.with_closed ? noOp : function (g) {
+        return g.is_open;
+      },
+          maybeWithArchived = options.with_archived ? noOp : function (g) {
+        return !g.is_archived;
+      };
+
+      return Object.keys(this.slack.groups).map(function (k) {
+        return _this2.slack.groups[k];
+      }).filter(maybeOpenOnly).filter(maybeWithArchived).map(function (g) {
+        return name;
+      });
     }
+
+    // because it's a slack bot callback, `this` will be slack
+    // so get the host object and pass it in as self instead
+
+  }, {
+    key: 'handleConnect',
+    value: function handleConnect(self) {
+
+      var lchannels = self.channels(),
+          lgroups = self.groups();
+
+      console.log('Welcome to Slack. You are ' + self.slack.self.name + ' of ' + self.slack.team.name);
+
+      console.log(lchannels.length > 0 ? 'You are in channels #' + lchannels.join(', #') : 'You are not in any channels.');
+
+      console.log(lgroups.length > 0 ? 'You are in groups %' + lgroups.join(', %') : 'You are not in any groups.');
+    }
+
+    // because it's a slack bot callback, `this` will be slack
+    // so get the host object and pass it in as self instead
+
   }, {
     key: 'handleMessage',
-    value: function handleMessage(msg) {}
+    value: function handleMessage(self, msg) {}
   }, {
     key: 'connect',
     value: function connect() {
+      var _this3 = this;
 
-      this.slack.on('open', this.handleConnect);
-      this.slack.on('message', this.handleMessage);
+      this.slack.on('open', function () {
+        return _this3.handleConnect(_this3);
+      });
+      this.slack.on('message', function (msg) {
+        return _this3.handleMessage(_this3, msg);
+      });
 
       this.slack.login();
     }
   }]);
 
-  return _default;
+  return Bot;
 })();
 
-exports['default'] = _default;
+exports['default'] = Bot;
 module.exports = exports['default'];

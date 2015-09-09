@@ -8,7 +8,7 @@ var slack_lib = require('slack-client'),
 
 
 
-export default class {
+export default class Bot {
 
   constructor(options) {
 
@@ -23,18 +23,22 @@ export default class {
 
     this.slack         = new slack_lib(this.key, this.autoReconnect, this.autoMark);
 
+    console.log('constructed!');
+
   }
 
 
 
-  channels(options) {
+  channels(uOptions) {
 
-    var noOp             = (c => true),
+    var options          = uOptions || {},
+
+        noOp             = (c => true),
         maybeMembersOnly = options.with_nonmember? noOp : (c => c.is_member);
 
     return Object
-      .keys(slack.channels)
-      .map(k => slack.channels[k])
+      .keys(this.slack.channels)
+      .map(k => this.slack.channels[k])
       .filter(maybeMembersOnly)
       .map(c => c.name);
 
@@ -42,15 +46,17 @@ export default class {
 
 
 
-  groups(options) {
+  groups(uOptions) {
 
-    var noOp              = (c => true),
+    var options           = uOptions || {},
+
+        noOp              = (c => true),
         maybeOpenOnly     = options.with_closed   ? noOp : (g =>  g.is_open),
         maybeWithArchived = options.with_archived ? noOp : (g => !g.is_archived);
 
     return Object
-      .keys(slack.groups)
-      .map(k => slack.groups[k])
+      .keys(this.slack.groups)
+      .map(k => this.slack.groups[k])
       .filter(maybeOpenOnly)
       .filter(maybeWithArchived)
       .map(g => name);
@@ -59,27 +65,33 @@ export default class {
 
 
 
-  handleConnect() {
-/*
-    var channels = myChannels(),
-        groups   = myGroups();
-*/
-    console.log('Welcome to Slack. You are ' + this.slack.self.name
-              + ' of '                       + slack.team.name);
-/*
-    console.log( (channels.length > 0)?
-      ('You are in channels #' + channels.join(', #')) :
+  // because it's a slack bot callback, `this` will be slack
+  // so get the host object and pass it in as self instead
+
+  handleConnect(self) {
+
+    var lchannels = self.channels(),
+        lgroups   = self.groups();
+
+    console.log('Welcome to Slack. You are ' + self.slack.self.name
+              + ' of '                       + self.slack.team.name);
+
+    console.log( (lchannels.length > 0)?
+      ('You are in channels #' + lchannels.join(', #')) :
       ('You are not in any channels.'                ));
 
-    console.log( (groups.length > 0)?
-      ('You are in groups %' + groups.join(', %')) :
+    console.log( (lgroups.length > 0)?
+      ('You are in groups %' + lgroups.join(', %')) :
       ('You are not in any groups.'              ));
-*/
+
   }
 
 
 
-  handleMessage(msg) {
+  // because it's a slack bot callback, `this` will be slack
+  // so get the host object and pass it in as self instead
+
+  handleMessage(self, msg) {
 
   }
 
@@ -87,8 +99,8 @@ export default class {
 
   connect() {
 
-    this.slack.on('open',    this.handleConnect);
-    this.slack.on('message', this.handleMessage);
+    this.slack.on('open',    ()    => this.handleConnect(this));
+    this.slack.on('message', (msg) => this.handleMessage(this, msg));
 
     this.slack.login();
 
