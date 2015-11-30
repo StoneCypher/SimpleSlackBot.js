@@ -2,6 +2,8 @@
 
 A better lightweight client wrapper for the Slack RTAPI
 
+This is a work in progress.
+
 
 
 
